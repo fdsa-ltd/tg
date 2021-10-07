@@ -1,0 +1,49 @@
+#!/bin/bash
+# author:zhumingwu
+# url:blog.zhumingwu.cn
+export PATH="$PATH:/usr/local/go/bin"
+export GOPROXY="https://goproxy.io"
+export GO111MODULE="on"
+
+set name=`basename "$0"` 
+name=`cd "$name"; pwd`
+name="${name##*/}"
+
+if [ $1 ] ; then
+    rm -f go.mod
+    rm -f go.sum
+    go mod init fdsa.ltd/$name
+fi
+
+# OLDGOPATH="$GOPATH"
+# export GOPATH=`pwd`
+
+# gofmt -w src
+set GOOS=linux
+set GOARCH=amd64
+if [ $1 ] ; then
+    go build -ldflags="-s -w" -o ./bin/$name fdsa.ltd/$name/src
+else
+    go build -o ./bin/$name fdsa.ltd/$name/src
+fi
+
+
+set GOOS=windows
+set GOARCH=amd64
+if [ $1 ] ; then
+    go build -ldflags="-s -w" -o ./bin/$name.exe fdsa.ltd/$name/src
+else
+    go build -o ./bin/$name.exe fdsa.ltd/$name/src
+fi
+
+if [ $1 ] ; then
+    upx -9 ./bin/$name.exe
+    upx -9 ./bin/$name
+fi
+
+rm target -rf
+mkdir target
+cd ..
+tar -czvf $name/target/$name.tar.gz $name/install $name/install.bat $name/bin $name/*.md $name/docs
+zip $name/target/$name.zip $name/install $name/install.bat $name/bin $name/*.md $name/docs
+echo go: all is finished
