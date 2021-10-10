@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-
 	conf := flag.String("c", "tg.json", "config file")
 	flag.Parse()
 	fileData, err := ioutil.ReadFile(*conf)

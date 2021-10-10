@@ -54,7 +54,18 @@ func assert(asserts []string, r *http.Request) bool {
 
 		switch m[0] {
 		case "time":
-			if false {
+			from, err := strconv.ParseInt(m[1], 10, 64)
+			if nil != err {
+				log.Fatal("")
+				return false
+			}
+			end, err := strconv.ParseInt(m[2], 10, 64)
+			if nil != err {
+				log.Fatal("")
+				return false
+			}
+			now := time.Now().Unix()
+			if now < from || now > end {
 				return false
 			}
 		case "host":
@@ -83,8 +94,15 @@ func assert(asserts []string, r *http.Request) bool {
 				return false
 			}
 		case "header":
-			if r.Header.Get(m[1]) == "" {
-				return false
+			kv := strings.Index(m[1], "=")
+			if kv <= 0 {
+				if r.Header.Get(m[1]) == "" {
+					return false
+				}
+			} else {
+				if r.Header.Get(m[1][0:kv]) != m[1][kv+1:] {
+					return false
+				}
 			}
 		}
 	}
@@ -252,8 +270,8 @@ func (my *Host) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if assert(router.Asserts, r) {
+				log.Println("命中router:", router.Name)
 				Filter(router.Filters, r)
-				log.Println(router)
 				r.Host = url.Host
 				proxy := httputil.NewSingleHostReverseProxy(url)
 				proxy.ServeHTTP(w, r)

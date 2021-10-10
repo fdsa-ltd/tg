@@ -19,20 +19,4 @@ host:
   #     uri: http://10.168.4.14
   #     asserts:
   #       - host 127.0.0.1:5555
-  # - name: localhost
-  #   location:
-  #   - path: bing
-  #     forword: http://www.bing.com
-  #   - path: 123
-  #     forword: http://10.168.4.14/
-  #   - Prefix: baidu
-  #     Forword: http://www.baidu.com
-  # - name: 127.0.0.1
-  #   forword: http://10.168.4.14
-  #   location:
-  #   - Prefix: bing
-  #     Forword: http://www.bing.com
-  #   - Prefix: 111
-  #     Forword: http://10.168.4.14/
-  #   - Prefix: baidu
-  #     Forword: http://www.baidu.com
+  

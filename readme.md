@@ -13,24 +13,36 @@
 1. 使用vue统一前端基础操作
 1. 使用基于bootstrap布局网页
 
-## go使用方法
+# TG使用
 
-Golang支持交叉编译，也就是说你在32位平台的机器上开发，可以编译生成64位平台上的可执行程序。
+## 配置文件
+配置文件默认./tg.json, 可以通过参数：-c path指定。
 
-交叉编译依赖下面几个环境变量：
+- root指定前端文件目录
+- port指定服务端口号
+- templates 指定动态模板文件，可以设置动态加载微前端
+- routers 指定动态路由
+  - Name    路由名称
+  - Uri     路由资源路径
+  - Asserts []断言
+  - Filters []处理
 
-$GOARCH    目标平台（编译后的目标平台）的处理器架构（386、amd64、arm）
-$GOOS          目标平台（编译后的目标平台）的操作系统（darwin、freebsd、linux、windows）
+## 断言配置
 
-```cmd
-# build for linux
-set GOOS=linux
-set GOARCH=amd64
-go build app.go
+- time from end - 时间在from 和 end 之间
+- host keys... - host在keys之中
+- mothod in keys... - method 在keys之中
+- path keys... - path以keys这中的开头
+- ip in keys... - 远程语法IP在keys之中
+- query has key[=v] - query中包含key=v的情况
+-  cookie has content - cookie中包含content的情况
+-  header has key[=v] - header中包含key=v的情况
 
-# build for windows
-set GOOS=windows
-set GOARCH=amd64
-go build app.go
-```
+## 处理配置
+
+- path insert path - 在path前面增加路径
+- path append path - 在path之后增加路径
+- path remove n - 将path前n段移除
+- header k v - 在header中设置k:v
+- cookie k v - 在cookie中设置k:v
 

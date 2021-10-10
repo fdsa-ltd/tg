@@ -1,10 +1,23 @@
 {
-  "Root": "./public",
-  "Port": "5555",
-  "Templates": [
+  "root": "./public",
+  "port": "5555",
+  "templates": [
     "index.html",
     "index2.html",
     "index3.html"
   ],
-  "Routes": null
+  "routes": [
+    {
+      "name": "bing",
+      "uri": "https://cn.bing.com/",
+      "asserts": [
+        "host localhost:5555",
+        "path /bing",
+        "cookie userInfoSeller="
+      ],
+      "filters": [
+        "path remove 1"
+      ]
+    }
+  ]
 }
