@@ -75,19 +75,18 @@ func assert(asserts []string, r *http.Request) bool {
 				return false
 			}
 		case "query":
-			if strings.Index(r.URL.RawQuery, m[1]) < 0 {
+			if !strings.Contains(r.URL.RawQuery, m[1]) {
 				return false
 			}
 		case "cookie":
-			if strings.Index(r.Header.Get("cookie"), m[1]) < 0 {
+			if !strings.Contains(r.Header.Get("cookie"), m[1]) {
 				return false
 			}
 		case "header":
-			if false {
+			if r.Header.Get(m[1]) == "" {
 				return false
 			}
 		}
-
 	}
 	return true
 }
@@ -232,7 +231,6 @@ func (host *Host) watch() {
 		}
 	}()
 	for _, v := range host.Templates {
-		log.Println(host.Root + "/" + v)
 		err = watcher.Add(host.Root + "/" + v)
 		if err != nil {
 			log.Fatal(err)
@@ -242,7 +240,6 @@ func (host *Host) watch() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	<-done
 }
 func (my *Host) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -266,9 +263,11 @@ func (my *Host) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if temp != nil {
 		var path = r.URL.Path
-		if path == "" || path == "/" {
-			temp.ExecuteTemplate(w, "index.html", plugins)
-			return
+		if path == "/" {
+			path = "/index.html"
+		}
+		if _, err := os.Lstat(my.Root + r.URL.Path); os.IsNotExist(err) {
+			path = "/index.html"
 		}
 		t := temp.Lookup(path[1:])
 		if nil != t {

@@ -4,17 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="importmap-type" content="systemjs-importmap">
-  <title>Microfrontends {{ . }}</title>
+  <title>Micro front end</title>
   <script type="systemjs-importmap">
     {
       "imports": {
         {{ range . }}
         "{{ .Path }}": "{{ .Entry }}",
         {{ end }} 
-        "vue": "https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js",
-        "vuex":"https://unpkg.com/vuex@3.6.2/dist/vuex.js",
-        "vue-router": "https://cdn.jsdelivr.net/npm/vue-router@3.1.6/dist/vue-router.min.js",
-        "single-spa": "https://cdn.jsdelivr.net/npm/single-spa@5.5.1/lib/system/single-spa.min.js"
+        "vue": "/js/vue/vue.min.js",
+        "vuex":"/js/vue/vuex.js",
+        "vue-router": "/js/vue/vue-router.min.js",
+        "single-spa": "/js/systemjs/single-spa.min.js"
       }
     }
   </script>
