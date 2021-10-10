@@ -176,17 +176,14 @@ func (my *Host) init() {
 	}
 	lock.Unlock()
 }
-func FileExist(path string) bool {
-	_, err := os.Lstat(path)
-	return !os.IsNotExist(err)
-}
 
 func getPlugins(path string) []Plugin {
 	result := make([]Plugin, 0)
 	files, _ := ioutil.ReadDir(path)
 	for _, f := range files {
 		var plugin = &Plugin{}
-		if FileExist(path + "/" + f.Name() + "/" + "app.json") {
+
+		if _, err := os.Lstat(path + "/" + f.Name() + "/" + "app.json"); !os.IsNotExist(err) {
 			fileData, err := ioutil.ReadFile(path + "/" + f.Name() + "/" + "app.json")
 			if nil == err {
 				_ = json.Unmarshal([]byte(fileData), plugin)
