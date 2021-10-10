@@ -32,12 +32,12 @@ if "%1" == "" (
 echo go: windows version is finished ok
 
 
-@REM if "%1" == "" (
-@REM     echo go: package...
-@REM ) else (
-@REM     upx -9 ./bin/%name%.exe
-@REM     upx -9 ./bin/%name%
-@REM )
+if "%1" == "" (
+    echo go: package...
+) else (
+    upx -9 ./bin/%name%.exe
+    upx -9 ./bin/%name%
+)
 
 @REM if not exist target (
 @REM     mkdir target

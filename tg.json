@@ -1,0 +1,10 @@
+{
+  "Root": "./public",
+  "Port": "5555",
+  "Templates": [
+    "index.html",
+    "index2.html",
+    "index3.html"
+  ],
+  "Routes": null
+}

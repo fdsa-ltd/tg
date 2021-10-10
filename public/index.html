@@ -9,7 +9,7 @@
     {
       "imports": {
         {{ range . }}
-        "{{ .Name }}": "{{ .Uri }}",
+        "{{ .Path }}": "{{ .Entry }}",
         {{ end }} 
         "vue": "https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js",
         "vuex":"https://unpkg.com/vuex@3.6.2/dist/vuex.js",
@@ -50,13 +50,14 @@
         </li>
         {{ range . }}     
           <li class="nav-item d-none d-sm-inline-block">
-          <router-link to="/{{ .Name }}" class="nav-link">{{ .Name }}</router-link>
+          <router-link to="/{{ .Path }}" class="nav-link">{{ .Name }}</router-link>
           </li>
         {{ end }}        
         <li class="nav-item d-none d-sm-inline-block">
           <router-link to="/about" class="nav-link">关于</router-link>
         </li>
       </ul>
+
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">
         <!-- Navbar Search -->
@@ -1480,9 +1481,6 @@
       <!-- /.content -->
     </div>
   </template>
-  <!-- See //github.com/joeldenning/import-map-overrides#user-interface  -->
-  <import-map-overrides-full show-when-local-storage="overrides-ui"></import-map-overrides-full>
-
   <!-- REQUIRED SCRIPTS -->
 
   <!-- jQuery -->
@@ -1491,7 +1489,16 @@
   <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
   <!-- AdminLTE -->
   <script src="/js/adminlte.js"></script>
+
+  <!-- OPTIONAL SCRIPTS -->
+  <!-- ChartJS -->
+  <script src="plugins/chart.js/Chart.min.js"></script>
+
   <!-- AdminLTE for demo purposes -->
+  <script src="/js/demo.js"></script>
+  <!-- See //github.com/joeldenning/import-map-overrides#user-interface  -->
+  <import-map-overrides-full show-when-local-storage="overrides-ui"></import-map-overrides-full>
+
   <script>
     window.__POWERED_BY_ADMA__ = true;
 
@@ -1537,53 +1544,20 @@
           el: '#body',
           store,
           router,
-          // render: h => h(App)
         })
-
-        // singleSpa.registerApplication(
-        //   'app1',
-        //   () => System.import('app1'),
-        //   location => location.pathname.startsWith('/app1')
-        // );
-
-        // singleSpa.registerApplication(
-        //   'app2',
-        //   () => System.import('app2'),
-        //   location => location.pathname.startsWith('/app2')
-        // );
-
-        // singleSpa.registerApplication(
-        //   'app3',
-        //   () => System.import('app3'),
-        //   location => location.pathname.startsWith("/app3")
-        // );
-
-        // singleSpa.registerApplication(
-        //   'app4',
-        //   () => System.import('app4'),
-        //   location => location.pathname.startsWith("/app4")
-        // );
 
         {{ range . }}
         singleSpa.registerApplication(
-          '{{ .Name }}',
-          () => System.import('{{ .Name }}'),
-          location => location.pathname.startsWith('/{{ .Name }}')
+          '{{ .Path }}',
+          () => System.import('{{ .Path }}'),
+          location => location.pathname.startsWith('/{{ .Path }}')
         );
         {{ end }}
-        // singleSpa.navigateToUrl("/app1");
-        // singleSpa.navigateToUrl("/app2");
-        // singleSpa.navigateToUrl("/app3");
-        // singleSpa.navigateToUrl("/app4");    
-        // singleSpa.navigateToUrl("/")
         singleSpa.start();
       })
     })()
 
   </script>
-  <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-  <!-- <script src="js/pages/dashboard.js"></script> -->
-
 
 </body>
 

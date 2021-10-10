@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -29,8 +30,9 @@ type Route struct {
 	Filters []string
 }
 type Plugin struct {
-	Name string
-	Uri  string
+	Name  string
+	Path  string
+	Entry string
 }
 
 var (
@@ -170,34 +172,39 @@ func (my *Host) init() {
 			list[key] = my.Root + "/" + value
 		}
 		temp, _ = template.ParseFiles(list...)
-		// plugins = []Plugin{{Name: "app4", Uri: "/purehtml/js/app.js"}}
 		plugins = getPlugins(my.Root + "/apps")
-		log.Println(plugins)
 	}
 	lock.Unlock()
 }
+func FileExist(path string) bool {
+	_, err := os.Lstat(path)
+	return !os.IsNotExist(err)
+}
+
 func getPlugins(path string) []Plugin {
 	result := make([]Plugin, 0)
 	files, _ := ioutil.ReadDir(path)
 	for _, f := range files {
-		log.Printf("发现应用：%s\n", f.Name())
-		result = append(result, Plugin{Name: f.Name(), Uri: "/apps/" + f.Name() + "/dist/js/app.js"})
+		var plugin = &Plugin{}
+		if FileExist(path + "/" + f.Name() + "/" + "app.json") {
+			fileData, err := ioutil.ReadFile(path + "/" + f.Name() + "/" + "app.json")
+			if nil == err {
+				_ = json.Unmarshal([]byte(fileData), plugin)
+			}
+		}
+		if plugin.Path == "" {
+			plugin.Path = f.Name()
+		}
+		if plugin.Entry == "" {
+			plugin.Entry = "/apps/" + f.Name() + "/dist/js/app.js"
+		}
+		if plugin.Name == "" {
+			plugin.Name = f.Name()
+		}
+		log.Printf("发现应用：%s\n", *plugin)
+		result = append(result, *plugin)
 	}
-	// err := filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
-	// 	if f == nil {
-	// 		return err
-	// 	}
 
-	// 	if f.IsDir() {
-	// 		log.Println(path)
-	// 		log.Println(f.Name())
-	// 		result = append(result, Plugin{Name: f.Name(), Uri: "/" + f.Name() + "/dist/js/app.js"})
-	// 	}
-	// 	return nil
-	// })
-	// if err != nil {
-	// 	fmt.Printf("filepath.Walk() returned %v\n", err)
-	// }
 	return result
 }
 func (host *Host) watch() {
@@ -227,10 +234,18 @@ func (host *Host) watch() {
 			}
 		}
 	}()
-	err = watcher.Add(host.Root)
+	for _, v := range host.Templates {
+		log.Println(host.Root + "/" + v)
+		err = watcher.Add(host.Root + "/" + v)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	err = watcher.Add(host.Root + "/apps")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	<-done
 }
 func (my *Host) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -253,25 +268,16 @@ func (my *Host) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if temp != nil {
-		if r.URL.Path == "" || r.URL.Path == "/" {
-			temp.Execute(w, plugins)
+		var path = r.URL.Path
+		if path == "" || path == "/" {
+			temp.ExecuteTemplate(w, "index.html", plugins)
 			return
 		}
-		// log.Printf("Root: %s Path: %s\n", "判断文件是否存在", r.URL.Path)
-		if _, err := os.Stat(my.Root + r.URL.Path); os.IsNotExist(err) {
-			// data, err := ioutil.ReadFile(this.Root + "/index.html")
-
-			// if err == nil {
-			// 	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(data)))
-			// 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-			// 	w.Write(data)
-			// 	return
-			// }
-
-			temp.Execute(w, plugins)
+		t := temp.Lookup(path[1:])
+		if nil != t {
+			t.Execute(w, plugins)
 			return
 		}
-
 	}
 	http.FileServer(http.Dir(my.Root)).ServeHTTP(w, r)
 }

@@ -1,29 +1,27 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
+	"io/ioutil"
 	"log"
 	"net/http"
-
-	"github.com/spf13/viper"
 )
 
 func main() {
-	var host *Host
-	conf := flag.String("c", "ng.yaml", "config file")
-	flag.Parse()
-	viper.SetConfigFile(*conf)
-	viper.SetConfigType("yaml")
-	err := viper.ReadInConfig()
-	if nil != err {
-		log.Fatalln("ERROR:", err.Error())
-		host = &Host{Root: "./public", Port: "5555", Templates: []string{"index.html"}}
-	}
 
-	err = viper.UnmarshalKey("host", &host)
+	conf := flag.String("c", "tg.json", "config file")
+	flag.Parse()
+	fileData, err := ioutil.ReadFile(*conf)
 	if nil != err {
 		log.Fatalln("ERROR:", err.Error())
-		host = &Host{Root: "./public", Port: "5555", Templates: []string{"index.html"}}
+		return
+	}
+	host := &Host{}
+	err = json.Unmarshal([]byte(fileData), host)
+	if nil != err {
+		log.Fatalln("ERROR:", err.Error())
+		return
 	}
 
 	host.init()
